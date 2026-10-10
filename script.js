@@ -9,7 +9,7 @@ import {
 
 // Firebase Configuration for LabScheduler
 const firebaseConfig = {
-  apiKey: "AIzaSy...", // Your API Key
+  apiKey: "AIzaSy...", 
   authDomain: "labscheduler-89a54.firebaseapp.com",
   projectId: "labscheduler-89a54",
   storageBucket: "labscheduler-89a54.appspot.com",
@@ -35,7 +35,7 @@ onSnapshot(collection(db, "sessions"), (snapshot) => {
 }, (error) => {
   console.error("Firestore sync error:", error);
   if (scheduleBody) {
-    scheduleBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Error loading data: ${error.message}</td></tr>`;
+    scheduleBody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: red;">Error loading data: ${error.message}</td></tr>`;
   }
 });
 
@@ -46,6 +46,8 @@ if (sessionForm) {
 
     const facultyName = document.getElementById("facultyName").value.trim();
     const subject = document.getElementById("subject").value.trim();
+    const experiment = document.getElementById("experiment").value.trim();
+    const equipment = document.getElementById("equipment").value.trim();
     const labName = document.getElementById("labName").value.trim();
     const date = document.getElementById("date").value;
     const timeSlot = document.getElementById("timeSlot").value;
@@ -54,6 +56,8 @@ if (sessionForm) {
       await addDoc(collection(db, "sessions"), {
         facultyName,
         subject,
+        experiment,
+        equipment,
         labName,
         date,
         timeSlot,
@@ -75,7 +79,7 @@ function renderSchedule(sessions) {
   scheduleBody.innerHTML = "";
 
   if (sessions.length === 0) {
-    scheduleBody.innerHTML = `<tr><td colspan="5" style="text-align: center;">No scheduled sessions found.</td></tr>`;
+    scheduleBody.innerHTML = `<tr><td colspan="7" style="text-align: center;">No scheduled sessions found.</td></tr>`;
     return;
   }
 
@@ -84,6 +88,8 @@ function renderSchedule(sessions) {
     row.innerHTML = `
       <td>${session.facultyName || 'N/A'}</td>
       <td>${session.subject || 'N/A'}</td>
+      <td>${session.experiment || 'N/A'}</td>
+      <td>${session.equipment || 'N/A'}</td>
       <td>${session.labName || 'N/A'}</td>
       <td>${session.date || 'N/A'}</td>
       <td>${session.timeSlot || 'N/A'}</td>

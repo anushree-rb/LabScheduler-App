@@ -19,7 +19,7 @@
   <main class="container">
     <section class="welcome">
       <h2>Laboratory Management System</h2>
-      <p>Manage experiments, student schedules, and lab sessions in real time.</p>
+      <p>Manage experiments, equipment, student schedules, and lab sessions in real time.</p>
     </section>
 
     <!-- Form Section -->
@@ -32,13 +32,23 @@
         </div>
 
         <div class="form-group">
-          <label for="subject">Subject / Experiment</label>
-          <input type="text" id="subject" placeholder="e.g. Data Structures Lab" required>
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" placeholder="e.g. Physics" required>
+        </div>
+
+        <div class="form-group">
+          <label for="experiment">Experiment</label>
+          <input type="text" id="experiment" placeholder="e.g. Ohm's Law Verification" required>
+        </div>
+
+        <div class="form-group">
+          <label for="equipment">Equipment Required</label>
+          <input type="text" id="equipment" placeholder="e.g. Voltmeter, Ammeter, Resistor" required>
         </div>
 
         <div class="form-group">
           <label for="labName">Lab Name / Room</label>
-          <input type="text" id="labName" placeholder="e.g. CS Lab 1" required>
+          <input type="text" id="labName" placeholder="e.g. Physics Lab 1" required>
         </div>
 
         <div class="form-group">
@@ -63,6 +73,8 @@
           <tr>
             <th>Faculty</th>
             <th>Subject</th>
+            <th>Experiment</th>
+            <th>Equipment</th>
             <th>Lab / Room</th>
             <th>Date</th>
             <th>Time</th>
@@ -70,7 +82,7 @@
         </thead>
         <tbody id="scheduleBody">
           <tr>
-            <td colspan="5" style="text-align: center;">Loading sessions...</td>
+            <td colspan="7" style="text-align: center;">Loading sessions...</td>
           </tr>
         </tbody>
       </table>
