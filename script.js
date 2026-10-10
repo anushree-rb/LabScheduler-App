@@ -26,16 +26,21 @@ const db = getFirestore(app);
 // Get DOM Elements
 const sessionForm = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
+const totalEventsCount = document.getElementById("totalEventsCount");
+const warningsCount = document.getElementById("warningsCount");
+const formWarning = document.getElementById("formWarning");
+
+let currentSessions = [];
 
 // 1. Real-time Listener
 onSnapshot(
   collection(db, "sessions"),
   (snapshot) => {
-    const sessions = [];
+    currentSessions = [];
     snapshot.forEach((doc) => {
-      sessions.push({ id: doc.id, ...doc.data() });
+      currentSessions.push({ id: doc.id, ...doc.data() });
     });
-    renderSchedule(sessions);
+    renderDashboard(currentSessions);
   },
   (error) => {
     console.error("Firestore sync error:", error);
@@ -45,13 +50,35 @@ onSnapshot(
   }
 );
 
-// 2. Render Schedule Function
-function renderSchedule(sessions) {
+// 2. Render Dashboard Data & Stats
+function renderDashboard(sessions) {
   if (!scheduleBody) return;
   scheduleBody.innerHTML = "";
 
+  // Update Total Events Stat
+  if (totalEventsCount) {
+    totalEventsCount.textContent = sessions.length;
+  }
+
+  // Calculate conflicts (e.g., same room booked at the same date and time)
+  let conflictCount = 0;
+  const bookingTracker = new Set();
+
+  sessions.forEach((session) => {
+    const key = `${session.labRoom}_${session.date}_${session.time}`.toLowerCase();
+    if (bookingTracker.has(key)) {
+      conflictCount++;
+    } else {
+      bookingTracker.add(key);
+    }
+  });
+
+  if (warningsCount) {
+    warningsCount.textContent = conflictCount;
+  }
+
   if (sessions.length === 0) {
-    scheduleBody.innerHTML = `<tr><td colspan="8" class="text-center">No sessions scheduled yet.</td></tr>`;
+    scheduleBody.innerHTML = `<tr><td colspan="8" class="text-center text-muted">No sessions scheduled yet.</td></tr>`;
     return;
   }
 
@@ -73,18 +100,31 @@ function renderSchedule(sessions) {
   });
 }
 
-// 3. Add New Session
+// 3. Add New Session with Warning Check
 if (sessionForm) {
   sessionForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const labRoom = document.getElementById("labRoom")?.value;
-    const experiment = document.getElementById("experiment")?.value;
-    const equipment = document.getElementById("equipment")?.value;
-    const faculty = document.getElementById("faculty")?.value;
-    const group = document.getElementById("group")?.value;
+    const labRoom = document.getElementById("labRoom")?.value.trim();
+    const experiment = document.getElementById("experiment")?.value.trim();
+    const equipment = document.getElementById("equipment")?.value.trim();
+    const faculty = document.getElementById("faculty")?.value.trim();
+    const group = document.getElementById("group")?.value.trim();
     const date = document.getElementById("date")?.value;
     const time = document.getElementById("time")?.value;
+
+    // Check for duplicate / conflict entry
+    const isConflict = currentSessions.some(
+      (s) => s.labRoom.toLowerCase() === labRoom.toLowerCase() && s.date === date && s.time === time
+    );
+
+    if (isConflict) {
+      formWarning.textContent = `⚠️ Warning: Room "${labRoom}" is already booked on ${date} at ${time}!`;
+      formWarning.classList.remove("d-none");
+      return;
+    } else {
+      formWarning.classList.add("d-none");
+    }
 
     try {
       await addDoc(collection(db, "sessions"), {
@@ -98,6 +138,7 @@ if (sessionForm) {
         createdAt: new Date()
       });
       sessionForm.reset();
+      formWarning.classList.add("d-none");
     } catch (error) {
       console.error("Error adding session: ", error);
       alert("Failed to add session: " + error.message);
