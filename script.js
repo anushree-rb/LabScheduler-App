@@ -28,7 +28,6 @@ const sessionForm = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
 const totalEventsCount = document.getElementById("totalEventsCount");
 const warningsCount = document.getElementById("warningsCount");
-const formWarning = document.getElementById("formWarning");
 
 let currentSessions = [];
 
@@ -55,12 +54,10 @@ function renderDashboard(sessions) {
   if (!scheduleBody) return;
   scheduleBody.innerHTML = "";
 
-  // Update Total Events Stat
   if (totalEventsCount) {
     totalEventsCount.textContent = sessions.length;
   }
 
-  // Calculate conflicts (e.g., same room booked at the same date and time)
   let conflictCount = 0;
   const bookingTracker = new Set();
 
@@ -93,14 +90,14 @@ function renderDashboard(sessions) {
       <td>${session.date || "N/A"}</td>
       <td>${session.time || "N/A"}</td>
       <td>
-        <button class="btn btn-danger btn-sm" onclick="deleteSession('${session.id}')">Delete</button>
+        <button class="btn btn-danger btn-sm shadow-sm" onclick="deleteSession('${session.id}')">Delete</button>
       </td>
     `;
     scheduleBody.appendChild(row);
   });
 }
 
-// 3. Add New Session with Warning Check
+// 3. Add New Session with Popup Warning Modal
 if (sessionForm) {
   sessionForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -119,11 +116,12 @@ if (sessionForm) {
     );
 
     if (isConflict) {
-      formWarning.textContent = `⚠️ Warning: Room "${labRoom}" is already booked on ${date} at ${time}!`;
-      formWarning.classList.remove("d-none");
+      // Trigger Bootstrap Popup Modal Warning
+      const warningMessage = document.getElementById("warningModalMessage");
+      warningMessage.textContent = `Conflict Alert: Room "${labRoom}" is already booked on ${date} at ${time}!`;
+      const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
+      warningModal.show();
       return;
-    } else {
-      formWarning.classList.add("d-none");
     }
 
     try {
@@ -138,7 +136,6 @@ if (sessionForm) {
         createdAt: new Date()
       });
       sessionForm.reset();
-      formWarning.classList.add("d-none");
     } catch (error) {
       console.error("Error adding session: ", error);
       alert("Failed to add session: " + error.message);
