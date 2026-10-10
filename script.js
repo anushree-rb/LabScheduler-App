@@ -97,7 +97,7 @@ function renderDashboard(sessions) {
   });
 }
 
-// 3. Add New Session with Popup Warning Modal
+// 3. Add New Session with Guaranteed Dashboard Warning Message
 if (sessionForm) {
   sessionForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -115,13 +115,21 @@ if (sessionForm) {
       (s) => s.labRoom.toLowerCase() === labRoom.toLowerCase() && s.date === date && s.time === time
     );
 
+    // Create or find warning container above the form
+    let alertBox = document.getElementById("dashboardWarningAlert");
+    if (!alertBox) {
+      alertBox = document.createElement("div");
+      alertBox.id = "dashboardWarningAlert";
+      alertBox.className = "alert alert-danger fw-bold text-center mb-3 shadow-sm";
+      sessionForm.prepend(alertBox);
+    }
+
     if (isConflict) {
-      // Trigger Bootstrap Popup Modal Warning
-      const warningMessage = document.getElementById("warningModalMessage");
-      warningMessage.textContent = `Conflict Alert: Room "${labRoom}" is already booked on ${date} at ${time}!`;
-      const warningModal = new bootstrap.Modal(document.getElementById("warningModal"));
-      warningModal.show();
+      alertBox.textContent = `⚠️ Conflict Warning: Room "${labRoom}" is already booked on ${date} at ${time}!`;
+      alertBox.style.display = "block";
       return;
+    } else {
+      alertBox.style.display = "none";
     }
 
     try {
@@ -136,6 +144,7 @@ if (sessionForm) {
         createdAt: new Date()
       });
       sessionForm.reset();
+      alertBox.style.display = "none";
     } catch (error) {
       console.error("Error adding session: ", error);
       alert("Failed to add session: " + error.message);
