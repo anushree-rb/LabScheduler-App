@@ -1,47 +1,66 @@
 const form = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
 const message = document.getElementById("message");
+const nameInput = document.getElementById("nameInput");   // Replace "nameInput" with your actual HTML input ID for the name
+const timeInput = document.getElementById("timeInput");   // Replace "timeInput" with your actual HTML input ID for the time
 
 let sessions = [];
 
 // Safely load sessions from localStorage
 // Listen for real-time updates from Firestore
-window.onSnapshot(window.collection(window.db, "sessions"), (snapshot) => {
+window.onSchedule(window.collection(window.db, "sessions"), (snapshot) => {
   sessions = [];
   snapshot.forEach((doc) => {
     sessions.push({ id: doc.id, ...doc.data() });
   });
-  renderSessions(); // This calls your existing function that draws the table/list on screen
+  renderSchedule(); // This calls your existing function that draws the table/list on screen
 });
 form.addEventListener("submit", async function(event) {
   event.preventDefault();
 
-  // 1. Check for empty fields
-  if (!nameInput.value || !timeInput.value) {
-    message.textContent = "Please fill in all fields.";
-    message.style.color = "#b91c1c";
+  // Get input elements from your HTML form
+  const experimentNameInput = document.getElementById("experimentName") || document.querySelector("input[placeholder*='Experiment']");
+  const studentGroupInput = document.getElementById("studentGroup") || document.querySelector("input[placeholder*='Group']");
+  const laboratoryInput = document.getElementById("laboratory") || document.querySelector("input[placeholder*='Lab']");
+  const equipmentInput = document.getElementById("requiredEquipment") || document.querySelector("input[placeholder*='Equipment']");
+  const instructorInput = document.getElementById("instructor") || document.querySelector("input[placeholder*='Instructor']");
+  const timeSlotInput = document.getElementById("timeSlot") || document.querySelector("input[type='datetime-local'], select");
+
+  // Validate fields
+  if (!experimentNameInput?.value || !timeSlotInput?.value) {
+    if (message) {
+      message.textContent = "Please fill in the required fields.";
+      message.style.color = "#b91c1c";
+    }
     return;
   }
 
-  // 2. Prepare the new session object
+  // Build session object for Firestore
   const newSession = {
-    name: nameInput.value,
-    time: timeInput.value,
+    experimentName: experimentNameInput.value,
+    studentGroup: studentGroupInput?.value || "",
+    laboratory: laboratoryInput?.value || "",
+    requiredEquipment: equipmentInput?.value || "",
+    instructor: instructorInput?.value || "",
+    timeSlot: timeSlotInput.value,
     createdAt: new Date()
   };
 
-  // 3. Save directly to Firebase Firestore
   try {
+    // Save to Firestore
     await window.addDoc(window.collection(window.db, "sessions"), newSession);
 
-    message.textContent = "Session booked successfully!";
-    message.style.color = "#16a34a";
+    if (message) {
+      message.textContent = "Session booked successfully!";
+      message.style.color = "#16a34a";
+    }
     form.reset();
   } catch (error) {
     console.error("Firestore Error:", error);
-    message.textContent = "Could not save session to database.";
-    message.style.color = "#b91c1c";
+    if (message) {
+      message.textContent = "Could not save session to database.";
+      message.style.color = "#b91c1c";
+    }
   }
 });
-
 renderSchedule();
