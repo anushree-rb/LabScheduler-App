@@ -1,67 +1,72 @@
 const form = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
 const message = document.getElementById("message");
-const nameInput = document.getElementById("nameInput");   // Replace "nameInput" with your actual HTML input ID for the name
-const timeInput = document.getElementById("timeInput");   // Replace "timeInput" with your actual HTML input ID for the time
 
 let sessions = [];
 
-// Listen for real-time updates from Firestore
+// 1. Listen for real-time updates from Firestore
 window.onSnapshot(window.collection(window.db, "sessions"), (snapshot) => {
   sessions = [];
   snapshot.forEach((doc) => {
     sessions.push({ id: doc.id, ...doc.data() });
   });
-  renderSchedule(); // Or renderSessions() depending on your function name
+  renderSchedule();
 });
-  renderSchedule(); // This calls your existing function that draws the table/list on screen
-});
-form.addEventListener("submit", async function(event) {
-  event.preventDefault();
 
-  // Get input elements from your HTML form
-  const experimentNameInput = document.getElementById("experimentName") || document.querySelector("input[placeholder*='Experiment']");
-  const studentGroupInput = document.getElementById("studentGroup") || document.querySelector("input[placeholder*='Group']");
-  const laboratoryInput = document.getElementById("laboratory") || document.querySelector("input[placeholder*='Lab']");
-  const equipmentInput = document.getElementById("requiredEquipment") || document.querySelector("input[placeholder*='Equipment']");
-  const instructorInput = document.getElementById("instructor") || document.querySelector("input[placeholder*='Instructor']");
-  const timeSlotInput = document.getElementById("timeSlot") || document.querySelector("input[type='datetime-local'], select");
+// 2. Handle form submission
+if (form) {
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
 
-  // Validate fields
-  if (!experimentNameInput?.value || !timeSlotInput?.value) {
-    if (message) {
-      message.textContent = "Please fill in the required fields.";
-      message.style.color = "#b91c1c";
+    // Get input elements safely
+    const experimentNameInput = document.getElementById("experimentName");
+    const studentGroupInput = document.getElementById("studentGroup");
+    const laboratoryInput = document.getElementById("laboratory");
+    const equipmentInput = document.getElementById("requiredEquipment");
+    const instructorInput = document.getElementById("instructor");
+    const timeSlotInput = document.getElementById("timeSlot");
+
+    // Validate required fields
+    if (!experimentNameInput?.value || !timeSlotInput?.value) {
+      if (message) {
+        message.textContent = "Please fill in the required fields.";
+        message.style.color = "#b91c1c";
+      }
+      return;
     }
-    return;
-  }
 
-  // Build session object for Firestore
-  const newSession = {
-    experimentName: experimentNameInput.value,
-    studentGroup: studentGroupInput?.value || "",
-    laboratory: laboratoryInput?.value || "",
-    requiredEquipment: equipmentInput?.value || "",
-    instructor: instructorInput?.value || "",
-    timeSlot: timeSlotInput.value,
-    createdAt: new Date()
-  };
+    // Build session object for Firestore
+    const newSession = {
+      experimentName: experimentNameInput.value,
+      studentGroup: studentGroupInput?.value || "",
+      laboratory: laboratoryInput?.value || "",
+      requiredEquipment: equipmentInput?.value || "",
+      instructor: instructorInput?.value || "",
+      timeSlot: timeSlotInput.value,
+      createdAt: new Date()
+    };
 
-  try {
-    // Save to Firestore
-    await window.addDoc(window.collection(window.db, "sessions"), newSession);
-
-    if (message) {
-      message.textContent = "Session booked successfully!";
-      message.style.color = "#16a34a";
+    try {
+      // Save to Firestore
+      await window.addDoc(window.collection(window.db, "sessions"), newSession);
+      
+      if (message) {
+        message.textContent = "Session booked successfully!";
+        message.style.color = "#16a34a";
+      }
+      form.reset();
+    } catch (error) {
+      console.error("Firestore Error:", error);
+      if (message) {
+        message.textContent = "Could not save session to database.";
+        message.style.color = "#b91c1c";
+      }
     }
-    form.reset();
-  } catch (error) {
-    console.error("Firestore Error:", error);
-    if (message) {
-      message.textContent = "Could not save session to database.";
-      message.style.color = "#b91c1c";
-    }
-  }
-});
-renderSchedule();
+  });
+}
+
+// Render schedule function (keep your existing implementation if you have one)
+function renderSchedule() {
+  // If your project already defines renderSchedule(), this will use it.
+  // Otherwise, ensure it loops through `sessions` and displays them in your table/list.
+}
