@@ -20,7 +20,6 @@ const firebaseConfig = {
 // Initialize Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-
 // Get DOM Elements
 const sessionForm = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
