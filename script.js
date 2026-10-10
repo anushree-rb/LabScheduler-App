@@ -9,14 +9,14 @@ import {
 
 // Firebase Configuration for LabScheduler
 const firebaseConfig = {
-  apiKey: "AIzaSy...", 
-  authDomain: "labscheduler-89a54.firebaseapp.com",
-  projectId: "labscheduler-89a54",
-  storageBucket: "labscheduler-89a54.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef"
+  apiKey: "AIzaSyDo168X33WjoRH9g7K1K6XTQQcTQJlmgns",
+  authDomain: "labscheduler-3d8dc.firebaseapp.com",
+  projectId: "labscheduler-3d8dc",
+  storageBucket: "labscheduler-3d8dc.firebasestorage.app",
+  messagingSenderId: "711408547383",
+  appId: "1:711408547383:web:9b87061be0023a30df31b2",
+  measurementId: "G-YS8HZYQ8E5"
 };
-
 // Initialize Firebase & Firestore
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
