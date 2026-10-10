@@ -104,17 +104,35 @@
     <footer>
         <p>College Laboratory Experiment Scheduler | HAT VERTEX</p>
     </footer>
+<!-- 1. Firebase configuration and modular SDK initialization -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    <script src="script.js"></script>
-    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyCEe1-NCi1L6K3dMdl0a1NWfG5656eChDM",
-  authDomain: "labscheduler-89a54.firebaseapp.com",
-  projectId: "labscheduler-89a54",
-  storageBucket: "labscheduler-89a54.firebasestorage.app",
-  messagingSenderId: "559485463910",
-  appId: "1:559485463910:web:255fa4423009ed63152ca7",
-  measurementId: "G-HRKWJC4VG3"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyCEe1-NCi1L6K3dMd10a1NWfG5656eChDM",
+    authDomain: "labscheduler-89a54.firebaseapp.com",
+    projectId: "labscheduler-89a54",
+    storageBucket: "labscheduler-89a54.firebasestorage.app",
+    messagingSenderId: "559485463910",
+    appId: "1:559485463910:web:255fa4423009ed63152ca7",
+    measurementID: "G-HRKWJC4VG3"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // Attach to window so script.js can use them globally
+  window.db = db;
+  window.collection = collection;
+  window.addDoc = addDoc;
+  window.onSnapshot = onSnapshot;
+
+  console.log("Firebase is ready and attached to window!");
+</script>
+
+<!-- 2. Your custom application script loads AFTER Firebase -->
+<script src="script.js"></script>
 </body>
 </html>
