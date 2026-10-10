@@ -1,3 +1,13 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  onSnapshot, 
+  addDoc, 
+  deleteDoc, 
+  doc 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 // Firebase Configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDo168X33WjoRH9g7K1K6XTQQcTQJlmgns",
@@ -17,7 +27,7 @@ const db = getFirestore(app);
 const sessionForm = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
 
-// 1. Real-time Listener (Updates automatically on all devices)
+// 1. Real-time Listener
 onSnapshot(
   collection(db, "sessions"),
   (snapshot) => {
@@ -35,7 +45,7 @@ onSnapshot(
   }
 );
 
-// 2. Render Schedule Function with Group & Delete Option
+// 2. Render Schedule Function
 function renderSchedule(sessions) {
   if (!scheduleBody) return;
   scheduleBody.innerHTML = "";
