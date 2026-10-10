@@ -5,13 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>College Laboratory Experiment Scheduler</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    /* Quick inline styles for auth toggle if needed */
-    .hidden { display: none !important; }
-    #authContainer { max-width: 400px; margin: 80px auto; padding: 30px; background: #fff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .auth-toggle { margin-top: 15px; text-align: center; cursor: pointer; color: #0066cc; }
-    .user-bar { display: flex; justify-content: space-between; align-items: center; background: #f4f4f4; padding: 10px 20px; border-radius: 5px; margin-bottom: 20px; }
-  </style>
 </head>
 <body>
 
@@ -24,112 +17,79 @@
   </header>
 
   <main class="container">
-
-    <!-- ================= AUTHENTICATION SECTION (Shown when logged out) ================= -->
-    <section id="authSection" class="form-section">
-      <div id="authContainer">
-        <h2 id="authTitle" style="text-align: center; margin-bottom: 20px;">Faculty Login</h2>
-        <form id="authForm">
-          <div class="form-group">
-            <label for="authEmail">Email Address</label>
-            <input type="email" id="authEmail" placeholder="faculty@college.edu" required>
-          </div>
-
-          <div class="form-group">
-            <label for="authPassword">Password</label>
-            <input type="password" id="authPassword" placeholder="********" required>
-          </div>
-
-          <button type="submit" id="authSubmitBtn" style="width: 100%; margin-top: 10px;">Login</button>
-        </form>
-        <p class="auth-toggle" id="toggleAuthMode">Don't have an account? Sign Up</p>
-      </div>
+    <section class="welcome">
+      <h2>Laboratory Management System</h2>
+      <p>Manage experiments, equipment, student schedules, and lab sessions in real time.</p>
     </section>
 
-    <!-- ================= DASHBOARD SECTION (Shown when logged in) ================= -->
-    <section id="dashboardSection" class="hidden">
-      
-      <div class="user-bar">
-        <span id="userEmailDisplay">Welcome, User</span>
-        <button id="logoutBtn" style="background: #d9534f; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer;">Logout</button>
-      </div>
+    <!-- Form Section -->
+    <section class="form-section">
+      <h3>Add New Lab Session</h3>
+      <form id="sessionForm">
+        <div class="form-group">
+          <label for="facultyName">Faculty Name</label>
+          <input type="text" id="facultyName" placeholder="e.g. Dr. Smith" required>
+        </div>
 
-      <section class="welcome">
-        <h2>Laboratory Management System</h2>
-        <p>Manage experiments, equipment, student schedules, and lab sessions in real time.</p>
-      </section>
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input type="text" id="subject" placeholder="e.g. Physics" required>
+        </div>
 
-      <!-- Form Section -->
-      <section class="form-section">
-        <h3>Add New Lab Session</h3>
-        <form id="sessionForm">
-          <div class="form-group">
-            <label for="facultyName">Faculty Name</label>
-            <input type="text" id="facultyName" placeholder="e.g. Dr. Smith" required>
-          </div>
+        <div class="form-group">
+          <label for="experiment">Experiment</label>
+          <input type="text" id="experiment" placeholder="e.g. Ohm's Law Verification" required>
+        </div>
 
-          <div class="form-group">
-            <label for="subject">Subject</label>
-            <input type="text" id="subject" placeholder="e.g. Physics" required>
-          </div>
+        <div class="form-group">
+          <label for="equipment">Equipment Required</label>
+          <input type="text" id="equipment" placeholder="e.g. Voltmeter, Ammeter, Resistor" required>
+        </div>
 
-          <div class="form-group">
-            <label for="experiment">Experiment</label>
-            <input type="text" id="experiment" placeholder="e.g. Ohm's Law Verification" required>
-          </div>
+        <div class="form-group">
+          <label for="labName">Lab Name / Room</label>
+          <input type="text" id="labName" placeholder="e.g. Physics Lab 1" required>
+        </div>
 
-          <div class="form-group">
-            <label for="equipment">Equipment Required</label>
-            <input type="text" id="equipment" placeholder="e.g. Voltmeter, Ammeter, Resistor" required>
-          </div>
+        <div class="form-group">
+          <label for="date">Date</label>
+          <input type="date" id="date" required>
+        </div>
 
-          <div class="form-group">
-            <label for="labName">Lab Name / Room</label>
-            <input type="text" id="labName" placeholder="e.g. Physics Lab 1" required>
-          </div>
+        <div class="form-group">
+          <label for="timeSlot">Time Slot</label>
+          <input type="time" id="timeSlot" required>
+        </div>
 
-          <div class="form-group">
-            <label for="date">Date</label>
-            <input type="date" id="date" required>
-          </div>
-
-          <div class="form-group">
-            <label for="timeSlot">Time Slot</label>
-            <input type="time" id="timeSlot" required>
-          </div>
-
-          <button type="submit" id="submitBtn">Add Session</button>
-        </form>
-      </section>
-
-      <!-- Schedule Display Section -->
-      <section class="schedule-section">
-        <h3>Scheduled Lab Sessions</h3>
-        <table class="schedule-table">
-          <thead>
-            <tr>
-              <th>Faculty</th>
-              <th>Subject</th>
-              <th>Experiment</th>
-              <th>Equipment</th>
-              <th>Lab / Room</th>
-              <th>Date</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody id="scheduleBody">
-            <tr>
-              <td colspan="7" style="text-align: center;">Loading sessions...</td>
-            </tr>
-          </tbody>
-        </table>
-      </section>
-
+        <button type="submit" id="submitBtn">Add Session</button>
+      </form>
     </section>
 
+    <!-- Schedule Display Section -->
+    <section class="schedule-section">
+      <h3>Scheduled Lab Sessions</h3>
+      <table class="schedule-table">
+        <thead>
+          <tr>
+            <th>Faculty</th>
+            <th>Subject</th>
+            <th>Experiment</th>
+            <th>Equipment</th>
+            <th>Lab / Room</th>
+            <th>Date</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleBody">
+          <tr>
+            <td colspan="7" style="text-align: center;">Loading sessions...</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
   </main>
 
-  <!-- Firebase App & Logic Script -->
+  <!-- IMPORTANT: type="module" is required for ESM Firebase imports -->
   <script type="module" src="script.js"></script>
 </body>
 </html>
