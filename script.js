@@ -1,195 +1,96 @@
-const form = document.getElementById("sessionForm");
+// Import Firebase functions directly from CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+  getFirestore, 
+  collection, 
+  addDoc, 
+  onSnapshot 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// Your Firebase Configuration (replace with your config if different)
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "labscheduler-89a54.firebaseapp.com",
+  projectId: "labscheduler-89a54",
+  storageBucket: "labscheduler-89a54.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Get DOM Elements
+const sessionForm = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
-const message = document.getElementById("message");
-// 1. Get DOM Elements
-
 
 // ==========================================
-// PASTE THE REAL-TIME LISTENER HERE (TOP LEVEL)
+// 1. Real-Time Sync Listener (onSnapshot)
 // ==========================================
-window.onSnapshot(window.collection(window.db, "sessions"), (snapshot) => {
+onSnapshot(collection(db, "sessions"), (snapshot) => {
   const sessions = [];
-  
   snapshot.forEach((doc) => {
     sessions.push({ id: doc.id, ...doc.data() });
   });
-
-  // Re-render your timetable/dashboard whenever database changes
   renderSchedule(sessions);
 }, (error) => {
   console.error("Firestore sync error:", error);
 });
 
-// 2. Handle Form Submission
-if (form) {
-  form.addEventListener("submit", async function (event) {
-    event.preventDefault();
-    // ... your form submission logic ...
+// ==========================================
+// 2. Add Session Form Handler
+// ==========================================
+if (sessionForm) {
+  sessionForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const facultyName = document.getElementById("facultyName").value;
+    const subject = document.getElementById("subject").value;
+    const labName = document.getElementById("labName").value;
+    const date = document.getElementById("date").value;
+    const timeSlot = document.getElementById("timeSlot").value;
+
+    try {
+      await addDoc(collection(db, "sessions"), {
+        facultyName,
+        subject,
+        labName,
+        date,
+        timeSlot,
+        createdAt: new Date()
+      });
+
+      alert("Session added successfully!");
+      sessionForm.reset();
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      alert("Failed to add session: " + error.message);
+    }
   });
 }
 
-// 3. Render Schedule Function
+// ==========================================
+// 3. Render Sessions Function
+// ==========================================
 function renderSchedule(sessions) {
-  // ... your rendering logic ...
+  if (!scheduleBody) return;
+  scheduleBody.innerHTML = "";
+
+  if (sessions.length === 0) {
+    scheduleBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No sessions scheduled yet.</td></tr>`;
+    return;
+  }
+
+  sessions.forEach((session) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${session.facultyName || ''}</td>
+      <td>${session.subject || ''}</td>
+      <td>${session.labName || ''}</td>
+      <td>${session.date || ''}</td>
+      <td>${session.timeSlot || ''}</td>
+    `;
+    scheduleBody.appendChild(row);
+  });
 }
-let sessions = [];
-
-try {
-    sessions = JSON.parse(
-        localStorage.getItem("labSessions") || "[]"
-    );
-
-    if (!Array.isArray(sessions)) {
-        sessions = [];
-    }
-} catch (error) {
-    sessions = [];
-}
-
-function hasConflict(first, second) {
-    // Different time slots do not conflict.
-    if (first.time !== second.time) {
-        return false;
-    }
-
-    const sameLab =
-        first.lab.toLowerCase() === second.lab.toLowerCase();
-
-    const sameInstructor =
-        first.instructor.toLowerCase() ===
-        second.instructor.toLowerCase();
-
-    const sameEquipment =
-        first.equipment.toLowerCase() ===
-        second.equipment.toLowerCase();
-
-    return sameLab || sameInstructor || sameEquipment;
-}
-
-function saveSessions() {
-    localStorage.setItem(
-        "labSessions",
-        JSON.stringify(sessions)
-    );
-}
-
-function renderSchedule() {
-    scheduleBody.replaceChildren();
-
-    let conflictCount = 0;
-
-    sessions.forEach((session, index) => {
-        const hasClash = sessions.some((other, otherIndex) =>
-            index !== otherIndex && hasConflict(session, other)
-        );
-
-        if (hasClash) {
-            conflictCount++;
-        }
-
-        const row = document.createElement("tr");
-
-        [
-            session.experiment,
-            session.group,
-            session.lab,
-            session.equipment,
-            session.instructor,
-            session.time
-        ].forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value;
-            row.appendChild(cell);
-        });
-
-        const actionCell = document.createElement("td");
-        const deleteButton = document.createElement("button");
-
-        deleteButton.textContent = "Delete";
-        deleteButton.type = "button";
-        deleteButton.className = "delete-button";
-
-        deleteButton.addEventListener("click", () => {
-            sessions.splice(index, 1);
-            saveSessions();
-            renderSchedule();
-
-            message.textContent = "Session deleted.";
-            message.style.color = "#047857";
-        });
-
-        actionCell.appendChild(deleteButton);
-        row.appendChild(actionCell);
-
-        if (hasClash) {
-            row.style.backgroundColor = "#fee2e2";
-            row.title = "Resource conflict detected";
-        }
-
-        scheduleBody.appendChild(row);
-    });
-
-    document.getElementById("experimentCount").textContent =
-        new Set(
-            sessions.map(session =>
-                session.experiment.toLowerCase()
-            )
-        ).size;
-
-    document.getElementById("sessionCount").textContent =
-        sessions.length;
-
-    document.getElementById("conflictCount").textContent =
-        conflictCount;
-
-    document.getElementById("emptyMessage").hidden =
-        sessions.length > 0;
-}
-
-form.addEventListener("submit", function(event) {
-    event.preventDefault();
-
-    const newSession = {
-        experiment: document.getElementById("experiment").value.trim(),
-        group: document.getElementById("group").value.trim(),
-        lab: document.getElementById("lab").value.trim(),
-        equipment: document.getElementById("equipment").value.trim(),
-        instructor: document.getElementById("instructor").value.trim(),
-        time: document.getElementById("time").value
-    };
-
-    if (Object.values(newSession).some(value => !value)) {
-        message.textContent = "Please fill in all fields.";
-        message.style.color = "#b91c1c";
-        return;
-    }
-
-    const clashes = sessions.some(session =>
-        hasConflict(newSession, session)
-    );
-
-    sessions.push(newSession);
-
-    try {
-        saveSessions();
-    } catch (error) {
-        message.textContent =
-            "Could not save sessions in this browser.";
-        message.style.color = "#b91c1c";
-    }
-
-    renderSchedule();
-    form.reset();
-
-    if (clashes) {
-        message.textContent =
-            "Warning: Resource conflict detected! Check the red rows.";
-        message.style.color = "#b91c1c";
-    } else {
-        message.textContent =
-            "Session added successfully!";
-        message.style.color = "#047857";
-    }
-});
-
-renderSchedule();
