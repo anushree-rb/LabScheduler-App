@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab Scheduler</title>
-  <link href="https://cdn.jsdelivr.net/style/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-light">
 
   <div class="container py-5">
-    <h1 class="text-center mb-4">Lab Scheduler</h1>
+    <h1 class="text-center mb-4">Lab Scheduler Dashboard</h1>
 
     <!-- Form Section -->
     <div class="card shadow-sm mb-5">
@@ -29,6 +29,10 @@
             <div class="col-md-4">
               <label for="equipment" class="form-label">Equipment</label>
               <input type="text" class="form-control" id="equipment" placeholder="e.g. Oscilloscope" required>
+            </div>
+            <div class="col-md-4">
+              <label for="faculty" class="form-label">Faculty Name</label>
+              <input type="text" class="form-control" id="faculty" placeholder="e.g. Dr. Smith" required>
             </div>
             <div class="col-md-4">
               <label for="group" class="form-label">Group</label>
@@ -53,12 +57,13 @@
       <div class="card-body">
         <h5 class="card-title mb-3">Scheduled Lab Sessions</h5>
         <div class="table-responsive">
-          <table class="table table-striped table-hover align-middle">
+          <table class="table table-striped table-hover align-middle text-center">
             <thead class="table-dark">
               <tr>
                 <th>Lab / Room</th>
                 <th>Experiment</th>
                 <th>Equipment</th>
+                <th>Faculty</th>
                 <th>Group</th>
                 <th>Date</th>
                 <th>Time</th>

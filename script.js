@@ -40,7 +40,7 @@ onSnapshot(
   (error) => {
     console.error("Firestore sync error:", error);
     if (scheduleBody) {
-      scheduleBody.innerHTML = `<tr><td colspan="7" class="text-danger text-center">Error loading data: ${error.message}</td></tr>`;
+      scheduleBody.innerHTML = `<tr><td colspan="8" class="text-danger text-center">Error loading data: ${error.message}</td></tr>`;
     }
   }
 );
@@ -51,7 +51,7 @@ function renderSchedule(sessions) {
   scheduleBody.innerHTML = "";
 
   if (sessions.length === 0) {
-    scheduleBody.innerHTML = `<tr><td colspan="7" class="text-center">No sessions scheduled yet.</td></tr>`;
+    scheduleBody.innerHTML = `<tr><td colspan="8" class="text-center">No sessions scheduled yet.</td></tr>`;
     return;
   }
 
@@ -61,6 +61,7 @@ function renderSchedule(sessions) {
       <td>${session.labRoom || "N/A"}</td>
       <td>${session.experiment || "N/A"}</td>
       <td>${session.equipment || "N/A"}</td>
+      <td>${session.faculty || "N/A"}</td>
       <td>${session.group || "N/A"}</td>
       <td>${session.date || "N/A"}</td>
       <td>${session.time || "N/A"}</td>
@@ -80,6 +81,7 @@ if (sessionForm) {
     const labRoom = document.getElementById("labRoom")?.value;
     const experiment = document.getElementById("experiment")?.value;
     const equipment = document.getElementById("equipment")?.value;
+    const faculty = document.getElementById("faculty")?.value;
     const group = document.getElementById("group")?.value;
     const date = document.getElementById("date")?.value;
     const time = document.getElementById("time")?.value;
@@ -89,6 +91,7 @@ if (sessionForm) {
         labRoom,
         experiment,
         equipment,
+        faculty,
         group,
         date,
         time,
