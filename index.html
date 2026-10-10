@@ -1,70 +1,126 @@
-const form = document.getElementById("sessionForm");
-const scheduleBody = document.getElementById("scheduleBody");
-const message = document.getElementById("message");
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Laboratory Experiment Scheduler</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div>
+      <h1>LabScheduler</h1>
+      <p>College Laboratory Experiment Scheduler</p>
+    </div>
+    <span class="status">Smart Scheduling</span>
+  </header>
 
-let sessions = [];
+  <main class="container">
+    <!-- Dashboard Stats -->
+    <section class="stats">
+      <div class="stat-card">
+        <h3>Experiments</h3>
+        <p id="experimentCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Scheduled Sessions</h3>
+        <p id="sessionCount">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Conflicts</h3>
+        <p id="conflictCount">0</p>
+      </div>
+    </section>
 
-// 1. Listen for real-time updates from Firestore
-window.onSnapshot(window.collection(window.db, "sessions"), (snapshot) => {
-  sessions = [];
-  snapshot.forEach((doc) => {
-    sessions.push({ id: doc.id, ...doc.data() });
-  });
-  renderSchedule();
-});
+    <!-- Add Session Form -->
+    <section class="panel">
+      <h2>Add Laboratory Session</h2>
+      <form id="sessionForm">
+        <label for="experiment">Experiment Name</label>
+        <input id="experiment" type="text" placeholder="e.g. Electronics Experiment" required>
 
-// 2. Handle form submission
-if (form) {
-  form.addEventListener("submit", async function (event) {
-    event.preventDefault();
+        <label for="group">Student Group</label>
+        <input id="group" type="text" placeholder="e.g. Group A" required>
 
-    // Get input elements using the exact IDs from your index.html
-    const experimentInput = document.getElementById("experiment");
-    const groupInput = document.getElementById("group");
-    const labInput = document.getElementById("lab");
-    const equipmentInput = document.getElementById("equipment");
-    const instructorInput = document.getElementById("instructor");
-    const timeInput = document.getElementById("time");
+        <label for="lab">Laboratory</label>
+        <input id="lab" type="text" placeholder="e.g. Electronics Lab" required>
 
-    // Validate required fields
-    if (!experimentInput?.value || !timeInput?.value) {
-      if (message) {
-        message.textContent = "Please fill in the required fields.";
-        message.style.color = "#b91c1c";
-      }
-      return;
-    }
+        <label for="equipment">Required Equipment</label>
+        <input id="equipment" type="text" placeholder="e.g. Oscilloscope" required>
 
-    // Build session object for Firestore
-    const newSession = {
-      experimentName: experimentInput.value,
-      studentGroup: groupInput?.value || "",
-      laboratory: labInput?.value || "",
-      requiredEquipment: equipmentInput?.value || "",
-      instructor: instructorInput?.value || "",
-      timeSlot: timeInput.value,
-      createdAt: new Date()
+        <label for="instructor">Instructor</label>
+        <input id="instructor" type="text" placeholder="e.g. Dr. Kumar" required>
+
+        <label for="time">Time Slot</label>
+        <select id="time" required>
+          <option value="">Select a time</option>
+          <option value="09:00 - 10:00">09:00 - 10:00</option>
+          <option value="10:00 - 11:00">10:00 - 11:00</option>
+          <option value="11:00 - 12:00">11:00 - 12:00</option>
+          <option value="01:00 - 02:00">01:00 - 02:00</option>
+          <option value="02:00 - 03:00">02:00 - 03:00</option>
+        </select>
+
+        <button type="submit">Add Session</button>
+      </form>
+      <p id="message" role="status"></p>
+    </section>
+
+    <!-- Laboratory Timetable -->
+    <section class="panel">
+      <h2>Laboratory Timetable</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Experiment</th>
+              <th>Group</th>
+              <th>Laboratory</th>
+              <th>Equipment</th>
+              <th>Instructor</th>
+              <th>Time</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="scheduleBody">
+            <!-- Dynamic sessions will be injected here -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>College Laboratory Experiment Scheduler | HAT VERTEX</p>
+  </footer>
+
+  <!-- Firebase configuration and modular SDK initialization -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCEe1-NCi1L6K3dMd10a1NWfG5656eChDM",
+      authDomain: "labscheduler-89a54.firebaseapp.com",
+      projectId: "labscheduler-89a54",
+      storageBucket: "labscheduler-89a54.appspot.com",
+      messagingSenderId: "559485463910",
+      appId: "1:559485463910:web:255fa4423009ed63152ca7",
+      measurementId: "G-HRKWJC4VG3"
     };
 
-    try {
-      // Save to Firestore
-      await window.addDoc(window.collection(window.db, "sessions"), newSession);
-      
-      if (message) {
-        message.textContent = "Session booked successfully!";
-        message.style.color = "#16a34a";
-      }
-      form.reset();
-    } catch (error) {
-      console.error("Firestore Error:", error);
-      if (message) {
-        message.textContent = "Could not save session to database.";
-        message.style.color = "#b91c1c";
-      }
-    }
-  });
-}
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-function renderSchedule() {
-  // Placeholder for your table rendering logic
-}
+    window.db = db;
+    window.collection = collection;
+    window.addDoc = addDoc;
+    window.onSnapshot = onSnapshot;
+
+    console.log("Firebase is ready and attached to window!");
+  </script>
+
+  <!-- Custom application script -->
+  <script type="module" src="script.js"></script>
+</body>
+</html>
