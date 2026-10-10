@@ -6,13 +6,14 @@ const timeInput = document.getElementById("timeInput");   // Replace "timeInput"
 
 let sessions = [];
 
-// Safely load sessions from localStorage
 // Listen for real-time updates from Firestore
-window.onSchedule(window.collection(window.db, "sessions"), (snapshot) => {
+window.onSnapshot(window.collection(window.db, "sessions"), (snapshot) => {
   sessions = [];
   snapshot.forEach((doc) => {
     sessions.push({ id: doc.id, ...doc.data() });
   });
+  renderSchedule(); // Or renderSessions() depending on your function name
+});
   renderSchedule(); // This calls your existing function that draws the table/list on screen
 });
 form.addEventListener("submit", async function(event) {
