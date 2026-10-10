@@ -1,7 +1,37 @@
 const form = document.getElementById("sessionForm");
 const scheduleBody = document.getElementById("scheduleBody");
 const message = document.getElementById("message");
+// 1. Get DOM Elements
 
+
+// ==========================================
+// PASTE THE REAL-TIME LISTENER HERE (TOP LEVEL)
+// ==========================================
+window.onSnapshot(window.collection(window.db, "sessions"), (snapshot) => {
+  const sessions = [];
+  
+  snapshot.forEach((doc) => {
+    sessions.push({ id: doc.id, ...doc.data() });
+  });
+
+  // Re-render your timetable/dashboard whenever database changes
+  renderSchedule(sessions);
+}, (error) => {
+  console.error("Firestore sync error:", error);
+});
+
+// 2. Handle Form Submission
+if (form) {
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    // ... your form submission logic ...
+  });
+}
+
+// 3. Render Schedule Function
+function renderSchedule(sessions) {
+  // ... your rendering logic ...
+}
 let sessions = [];
 
 try {
